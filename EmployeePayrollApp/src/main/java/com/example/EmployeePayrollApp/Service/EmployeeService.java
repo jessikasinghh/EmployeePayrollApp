@@ -35,10 +35,10 @@ public class EmployeeService {
         return employee;
     }
 
-    // Update employee by ID
+    // Update employee details
     public Employee updateEmployee(Long id, EmployeeDTO employeeDTO) {
         Employee employee = getEmployeeById(id)
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
+                .orElseThrow(() -> new RuntimeException("Employee not found")); // ✅ Fix: Handle missing employees
 
         employee.setName(employeeDTO.getName());
         employee.setSalary(employeeDTO.getSalary());
@@ -47,6 +47,10 @@ public class EmployeeService {
 
     // Delete employee by ID
     public void deleteEmployee(Long id) {
-        employeeList.removeIf(emp -> emp.getId().equals(id));
+        Employee employee = getEmployeeById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found")); // ✅ Fix: Handle missing employees
+        employeeList.remove(employee);
     }
 }
+
+
