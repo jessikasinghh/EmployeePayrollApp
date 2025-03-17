@@ -1,40 +1,52 @@
 package com.example.EmployeePayrollApp.Service;
 
+
+import com.example.EmployeePayrollApp.dto.EmployeeDTO;
 import com.example.EmployeePayrollApp.Model.Employee;
-import com.example.EmployeePayrollApp.Repository.EmployeeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class EmployeeService {
 
-    @Autowired
-    private EmployeeRepository employeeRepository;
+    private final List<Employee> employeeList = new ArrayList<>();
+    private Long idCounter = 1L; // Simulating database auto-increment
 
+    // Get all employees
     public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
+        return employeeList;
     }
 
+    // Get employee by ID (Return Optional)
     public Optional<Employee> getEmployeeById(Long id) {
-        return employeeRepository.findById(id);
+        return employeeList.stream()
+                .filter(emp -> emp.getId().equals(id))
+                .findFirst();
     }
 
-    public Employee createEmployee(Employee employee) {
-        return employeeRepository.save(employee);
+    // Add a new employee
+    public Employee createEmployee(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee(employeeDTO);
+        employee.setId(idCounter++); // Simulating DB ID generation
+        employeeList.add(employee);
+        return employee;
     }
 
-    public Employee updateEmployee(Long id, Employee employeeDetails) {
-        Employee employee = employeeRepository.findById(id)
+    // Update employee by ID
+    public Employee updateEmployee(Long id, EmployeeDTO employeeDTO) {
+        Employee employee = getEmployeeById(id)
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
-        employee.setName(employeeDetails.getName());
-        employee.setSalary(employeeDetails.getSalary());
-        return employeeRepository.save(employee);
+
+        employee.setName(employeeDTO.getName());
+        employee.setSalary(employeeDTO.getSalary());
+        return employee;
     }
 
+    // Delete employee by ID
     public void deleteEmployee(Long id) {
-        employeeRepository.deleteById(id);
+        employeeList.removeIf(emp -> emp.getId().equals(id));
     }
 }
